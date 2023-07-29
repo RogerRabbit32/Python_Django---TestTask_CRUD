@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create/Delete Post</title>
+</head>
+<body>
+    <h1>Create/Delete Post</h1>
+
+     <!-- Form to create a new post -->
+    <form id="create-post-form">
+        <input type="text" name="title" placeholder="Enter title" required>
+        <textarea name="body" placeholder="Enter body" required></textarea>
+        <button type="submit">Create Post</button>
+    </form>
+
+    <!-- Form to delete a post -->
+    <form id="delete-post-form">
+        <input type="number" name="post_id" placeholder="Enter post ID to delete" required>
+        <button type="submit">Delete Post</button>
+    </form>
+
+    <a href="{% url 'home-page' %}">Back to Home</a>
+
+<script>
+        const authToken = "{{ user.auth_token }}";
+
+        // Function to handle form submission for creating a new post
+        async function createNewPost(event) {
+            event.preventDefault();
+            try {
+                const formElement = document.getElementById('create-post-form');
+                const formData = new FormData(formElement);
+                const response = await fetch('/api/posts/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Token ${authToken}`
+                    },
+                    body: formData
+                });
+                if (response.ok) {
+                    // Refresh the page to display the new post
+                    location.reload();
+                } else {
+                    // Handle the error (e.g., display an error message)
+                }
+            } catch (error) {
+                console.error('Error creating new post:', error);
+            }
+        }
+
+        // Function to handle form submission for deleting a post
+        async function deletePost(event) {
+            event.preventDefault();
+            try {
+                const formElement = document.getElementById('delete-post-form');
+                const formData = new FormData(formElement);
+                const postId = formData.get('post_id');
+                const response = await fetch(`/api/posts/${postId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Token ${authToken}`
+                    }
+                });
+                if (response.ok) {
+                    // Refresh the page to remove the deleted post
+                    location.reload();
+                } else {
+                    // Handle the error (e.g., display an error message)
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add event listeners for form submissions
+            document.getElementById('create-post-form').addEventListener('submit', createNewPost);
+            document.getElementById('delete-post-form').addEventListener('submit', deletePost);
+        });
+    </script>
+
+</body>
+</html>

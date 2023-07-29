@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User List</title>
+</head>
+<body>
+    <h1>User List</h1>
+    {% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}!</p>
+
+    <ul id="user-list">
+        <!-- User list will be populated using JavaScript -->
+    </ul>
+
+    <div id="user-posts">
+        <!-- User posts will be displayed here upon clicking a username -->
+    </div>
+
+    <a href="{% url 'create-delete-post' %}">
+        <button>Create/Delete Post</button>
+    </a>
+
+    <script>
+        const authToken = "{{ user.auth_token }}";
+
+        // Function to fetch user list
+        async function fetchUserList() {
+            try {
+                const response = await fetch('/api/users/', {
+                    headers: {
+                        'Authorization': `Token ${authToken}`
+                    }
+                });
+                const data = await response.json();
+                const userList = data.results;
+
+                // Populate the user list in the HTML
+                const userListElement = document.getElementById('user-list');
+                userList.forEach(user => {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a'); // Create a hyperlink element
+                    link.href = "#"; // Set the href to "#" for now, it will be updated in the click event
+                    link.textContent = user.username;
+                    listItem.appendChild(link);
+                    userListElement.appendChild(listItem);
+
+                    // Add click event listener to the hyperlink
+                    link.addEventListener('click', () => displayUserPosts(user));
+                });
+            } catch (error) {
+                console.error('Error fetching user list:', error);
+            }
+        }
+
+        // Function to display user posts
+        function displayUserPosts(user) {
+            // Clear previous user posts if any
+            const userPostsElement = document.getElementById('user-posts');
+            userPostsElement.innerHTML = '';
+
+            // Display the user's posts in the HTML
+            user.posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.innerHTML = `<h2>${post.title}</h2><p>${post.body}</p>`;
+                userPostsElement.appendChild(postElement);
+            });
+        }
+
+        // Call the fetchUserList function when the page loads
+        document.addEventListener('DOMContentLoaded', fetchUserList);
+    </script>
+
+    {% else %}
+        <p>Please login or register to access the user list.</p>
+    {% endif %}
+
+</body>
+</html>
