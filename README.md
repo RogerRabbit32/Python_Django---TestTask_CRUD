@@ -1,9 +1,9 @@
-# <i>INN accounts</i>
+# <i>Django CRUD</i>
 
 
 ## Description
 
-INN Accounts is a Django web application that provides functionality for handling user accounts and performing money transfers between users.
+Django CRUD is a Django web application that provides functionality for handling blog posts creation/deletion.
 
 ## Table of Contents
 
